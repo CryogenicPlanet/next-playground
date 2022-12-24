@@ -1,5 +1,11 @@
 {
   "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "declaration": true,
+    "noEmit": false,
+    "emitDeclarationOnly": true,
+    "outDir": "dist/src"
+  },
   "exclude": [],
   "include": ["vite.config.ts", "**/*.ts", "**/*.tsx", "**/*.cjs", "**/*.mjs"]
 }
