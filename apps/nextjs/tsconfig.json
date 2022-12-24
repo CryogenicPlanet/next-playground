@@ -8,5 +8,12 @@
     "**/*.tsx",
     "**/*.cjs",
     "**/*.mjs"
-  ]
+  ],
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "next-playground/api": ["../../packages/next-playground/src/api.ts"],
+      "next-playground": ["../../packages/next-playground/src/index.ts"]
+    }
+  }
 }

@@ -1,3 +1,3 @@
-import { NextPlaygroundApi } from 'next-playground/src/api'
+import { NextPlaygroundApi } from 'next-playground/api'
 
 export default NextPlaygroundApi

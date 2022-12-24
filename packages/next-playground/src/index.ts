@@ -1,1 +1,1 @@
-export { NextPlayground } from './lib/catchAll'
+export * from './lib/catchAll'

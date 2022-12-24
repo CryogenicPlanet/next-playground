@@ -1,1 +1,1 @@
-export { NextPlaygroundApi } from './lib/apiRoute'
+export * from './lib/apiRoute'

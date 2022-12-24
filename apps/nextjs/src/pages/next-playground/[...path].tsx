@@ -1,7 +1,7 @@
 import {
-  getServerSideProps,
+  getServerSidePropsNextPlayground,
   NextPlayground
-} from 'next-playground/src/lib/catchAll'
+} from 'next-playground'
 
 NextPlayground.importFunc = (p: string) =>
   import(
@@ -11,4 +11,4 @@ NextPlayground.importFunc = (p: string) =>
 
 export default NextPlayground
 
-export { getServerSideProps }
+export const getServerSideProps = getServerSidePropsNextPlayground

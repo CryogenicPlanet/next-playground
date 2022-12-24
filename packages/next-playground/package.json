@@ -1,13 +1,15 @@
 {
   "name": "next-playground",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && yarn tsc",
+    "build": "vite build && yarn build:api && yarn tsc",
+    "build:api": "tsup src/api.ts --format cjs,esm",
     "tsc": "tsc -p tsconfig.build.json && node dtsBundle.js",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "prepare": "yarn build"
   },
   "dependencies": {
     "@acme/tailwind-config": "*",
@@ -15,6 +17,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "ts-morph": "^17.0.1",
+    "tsup": "^6.5.0",
     "twind": "^0.16.19",
     "zod": "^3.20.0"
   },
@@ -27,5 +30,23 @@
     "next": "^13.0.7",
     "typescript": "^4.9.3",
     "vite": "^4.0.0"
+  },
+  "publishConfig": {
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "import": "./dist/index.es.js",
+        "require": "./dist/index.cjs.js"
+      },
+      "./api": {
+        "types": "./dist/api.d.ts",
+        "import": "./dist/api.js",
+        "require": "./dist/api.cjs"
+      }
+    },
+    "files": [
+      "dist",
+      "!dist/src"
+    ]
   }
 }

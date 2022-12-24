@@ -141,17 +141,19 @@ export const RenderElement = ({
 const Playground = ({ filepath }: { filepath: string }) => {
   const { data, error, isLoading } = useProps(filepath)
 
-  const { component } = useControls(
+  const { component: levaComponent } = useControls(
     'Global',
     {
       component: {
-        value: null,
+        value: data ? Object.keys(data)[0] : null,
         label: 'Component',
         options: Object.keys(data || {})
       }
     },
     [data]
   )
+
+  const component = levaComponent || (data ? Object.keys(data)[0] : null)
 
   const value = component ? data?.[component] : null
 
@@ -197,7 +199,9 @@ const Playground = ({ filepath }: { filepath: string }) => {
   )
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSidePropsNextPlayground: GetServerSideProps = async (
+  context
+) => {
   const path = context.params?.path
 
   const filepath = `${typeof path === 'string' ? path : path?.join('/')}`

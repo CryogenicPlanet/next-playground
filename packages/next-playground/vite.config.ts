@@ -11,16 +11,14 @@ export default defineConfig({
   plugins: [react()],
   build: {
     lib: {
-      entry: ['src/api.ts', 'src/index.ts'].map((v) =>
-        path.resolve(__dirname, v)
-      ),
+      entry: ['src/index.ts'].map((v) => path.resolve(__dirname, v)),
       name: pkg.name,
       fileName: (format, name) => `${name}.${format}.js`
     },
     rollupOptions: {
       // make sure to externalize deps that shouldn't be bundled
       // into your library
-      external: ['react', 'fs', 'node:fs/promises'],
+      external: ['react', 'node:fs/promises', 'node:fs'],
       output: {
         // Provide global variables to use in the UMD build
         // for externalized deps
