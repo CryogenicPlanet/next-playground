@@ -29,19 +29,20 @@ You can customise the default path and which files are allowed to be imported. Y
 ```tsx
 // pages/next-playground/[...path].tsx
 import {
-  getServerSideProps,
+  getServerSidePropsNextPlayground,
   NextPlayground
 } from 'next-playground'
 
 NextPlayground.importFunc = (p: string) =>
   import(
     /* webpackInclude: /\.tsx$/ */
-    `src/${p}`
+    `../../../src/${p}`
   )
 
 export default NextPlayground
 
-export { getServerSideProps }
+export const getServerSideProps = getServerSidePropsNextPlayground
+
 ```
 
 Make sure 2a and 2b are done correctly, these are very important and `next-playground` will not work if you don't do this.
@@ -49,7 +50,7 @@ Make sure 2a and 2b are done correctly, these are very important and `next-playg
 3. Add a api route `pages/api/next-playground/[next-playground].ts`
 
 ```ts
-import { NextPlaygroundApi } from 'next-playground'
+import { NextPlaygroundApi } from 'next-playground/api'
 
 export default NextPlaygroundApi
 ```

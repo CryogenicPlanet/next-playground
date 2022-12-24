@@ -1,10 +1,11 @@
 {
   "name": "next-playground",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "yarn build:client && yarn build:api && yarn tsc",
+    "build:vite": "vite build",
+    "build": "yarn build:vite && yarn build:api && yarn tsc",
     "build:client": "tsup src/index.ts --format cjs,esm",
     "build:api": "tsup src/api.ts --format cjs,esm",
     "tsc": "tsc -p tsconfig.build.json && node dtsBundle.js",
@@ -44,14 +45,18 @@
     "exports": {
       ".": {
         "types": "./dist/index.d.ts",
-        "import": "./dist/index.js",
-        "require": "./dist/index.cjs"
+        "import": "./dist/index.es.js",
+        "require": "./dist/index.umd.js"
       },
       "./api": {
         "types": "./dist/api.d.ts",
         "import": "./dist/api.js",
         "require": "./dist/api.cjs"
       }
-    }
-  }
+    },
+    "main": "./dist/index.umd.js",
+    "module": "./dist/index.es.js",
+    "types": "./dist/index.d.ts"
+  },
+  "license": "MIT"
 }
