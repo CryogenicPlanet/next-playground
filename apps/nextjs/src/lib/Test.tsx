@@ -5,7 +5,11 @@ function Dummy() {
 }
 
 export default function Test(props: TestProps) {
-  return <Dummy></Dummy>
+  return (
+    <div className="flex h-full w-full items-center justify-center p-40">
+      <Dummy></Dummy>
+    </div>
+  )
 }
 
 export const Test2 = ({
@@ -17,5 +21,7 @@ export const Test2 = ({
   value: number
   test: TestProps
 }) => {
+  console.log({ id, value, test })
+
   return <div className="h-full w-full bg-yellow-500 p-20"></div>
 }

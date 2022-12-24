@@ -5,7 +5,12 @@ import { readFile, writeFile } from 'node:fs/promises'
 import type { FunctionDeclaration, ts } from 'ts-morph'
 import { ArrowFunction, Node, Project, SyntaxKind } from 'ts-morph'
 
-import { FuncRecord, propFileSchema, PropType } from './types'
+import {
+  filePathWithoutExt,
+  FuncRecord,
+  propFileSchema,
+  PropType
+} from './types'
 
 const kindToTypeString = (kind: SyntaxKind) => {
   switch (kind) {
@@ -39,24 +44,12 @@ const kindToTypeString = (kind: SyntaxKind) => {
   }
 }
 
+export type TypeStrings = ReturnType<typeof kindToTypeString>
+
 export const generatePropsForFile = async (filePath: string) => {
   const project = new Project()
   project.addSourceFilesAtPaths('src/**/*.tsx')
   const sourceFile = project.getSourceFileOrThrow(`src/${filePath}`)
-
-  const functions = sourceFile.getFunctions()
-  const variables = sourceFile.getVariableDeclarations()
-
-  const exportedFuncs: Array<FunctionDeclaration | ArrowFunction> = []
-
-  const exportedFuncRecord: FuncRecord = {}
-
-  for (const func of functions) {
-    // check if exported
-    if (func.isExported()) {
-      exportedFuncs.push(func)
-    }
-  }
 
   const typeAlias = sourceFile.getTypeAliases()
 
@@ -67,11 +60,12 @@ export const generatePropsForFile = async (filePath: string) => {
       typeStr
         .replace('{', '')
         .replace('}', '')
-        .replace(/\n/g, '')
-        .split(';')
+        .split(typeStr.includes(';') ? ';' : '\n')
         .map((i) => i.split(':').map((v) => v.trim()))
         .filter((v) => v[0] !== '')
     )
+
+    console.log({ typeJson })
 
     const types: PropType = {}
 
@@ -159,7 +153,37 @@ export const generatePropsForFile = async (filePath: string) => {
     }
   }
 
+  const functions = sourceFile.getFunctions()
+  const variables = sourceFile.getVariableDeclarations()
+
+  const exportedFuncs: Array<FunctionDeclaration | ArrowFunction> = []
+
+  let defaultExport: FunctionDeclaration | ArrowFunction | null = null
+
+  const exportedFuncRecord: FuncRecord = {}
+
+  for (const func of functions) {
+    // check if exported
+
+    if (func.isDefaultExport()) {
+      defaultExport = func
+      continue
+    }
+
+    if (func.isExported()) {
+      exportedFuncs.push(func)
+    }
+  }
+
   for (const variable of variables) {
+    if (variable.isDefaultExport()) {
+      const initializer = variable.getInitializer()
+      if (initializer?.getKind() === 216 && Node.isArrowFunction(initializer)) {
+        defaultExport = initializer
+      }
+      continue
+    }
+
     if (variable.isExported()) {
       // Check if arrow function
 
@@ -172,8 +196,12 @@ export const generatePropsForFile = async (filePath: string) => {
 
   let idx = 0
 
-  for (const func of exportedFuncs) {
+  const handleFunc = (
+    func: FunctionDeclaration | ArrowFunction,
+    defaultExport: boolean = false
+  ) => {
     // Get props of func
+
     const parameters = func.getParameters()
 
     const name = Node.isFunctionDeclaration(func)
@@ -182,7 +210,8 @@ export const generatePropsForFile = async (filePath: string) => {
         func.getParent()?.getName() || `${ArrowFunction}-${idx++}`
 
     exportedFuncRecord[name] = {
-      props: []
+      props: [],
+      defaultExport: defaultExport
     }
 
     for (const parameter of parameters || []) {
@@ -198,6 +227,12 @@ export const generatePropsForFile = async (filePath: string) => {
     }
   }
 
+  for (const func of exportedFuncs) {
+    handleFunc(func)
+  }
+
+  if (defaultExport) handleFunc(defaultExport, true)
+
   const FILE_PATH = '.next/novella-props.json'
 
   if (existsSync(FILE_PATH)) {
@@ -206,13 +241,17 @@ export const generatePropsForFile = async (filePath: string) => {
       JSON.parse(await readFile(FILE_PATH, 'utf-8'))
     )
 
-    data[filePath] = exportedFuncRecord
+    data[filePathWithoutExt.parse(filePath)] = exportedFuncRecord
 
     await writeFile(FILE_PATH, JSON.stringify(data, null, 2), {
       encoding: 'utf-8'
     })
   } else {
-    const data = JSON.stringify({ [filePath]: exportedFuncRecord }, null, 2)
+    const data = JSON.stringify(
+      { [filePathWithoutExt.parse(filePath)]: exportedFuncRecord },
+      null,
+      2
+    )
 
     await writeFile(FILE_PATH, data, {
       encoding: 'utf-8'

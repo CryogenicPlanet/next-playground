@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 
 import { generatePropsForFile } from './morph'
-import { propFileSchema } from './types'
+import { filePathWithoutExt, propFileSchema } from './types'
 
 let creatingFile = false
 
@@ -9,7 +9,9 @@ export const NextPlaygroundApi = async (
   req: NextApiRequest,
   res: NextApiResponse
 ) => {
-  const filePath = (req.query.filePath || req.body.filePath) as string
+  const filePath = filePathWithoutExt.parse(
+    req.query.filePath || req.body.filePath
+  )
 
   if (req.method === 'GET') {
     await new Promise((resolve) => {
@@ -27,11 +29,19 @@ export const NextPlaygroundApi = async (
       encoding: 'utf-8'
     })
 
-    const data = propFileSchema.parse(JSON.parse(file))
+    const unsafeData = JSON.parse(file)
+
+    console.log('unsafeData', unsafeData)
+
+    const data = propFileSchema.parse(unsafeData)
+
+    console.log('data', data)
 
     const props = data[filePath]
+
+    console.log('props', { props, filePath })
     if (!props) {
-      res.status(404).json({ message: 'Props not found' })
+      res.status(404).send("File doesn't exist")
     } else {
       res.status(200).json(props)
     }
