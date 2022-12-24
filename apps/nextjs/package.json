@@ -10,9 +10,6 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@acme/api": "*",
-    "@acme/auth": "*",
-    "@acme/db": "*",
     "@acme/tailwind-config": "*",
     "@tanstack/react-query": "^4.20.4",
     "@trpc/client": "^10.5.0",
