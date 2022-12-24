@@ -20,11 +20,11 @@ npm install --save-dev next-playground
 
 2. Setup catchall route `pages/next-playground/[...path].tsx` **The name of the file is important**.
 
-2a. In this file you have to `export { getServerSideProps }` from `next-playground`
+-  In this file you have to `export { getServerSideProps }` from `next-playground`
 
-2b. You have to set `NextPlayground.importFunc` to a function that will import your components. This is because `webpack` does not allow dynamic imports anymore. This function will be called with the path to the component, and you have to return the import.
+-  You have to set `NextPlayground.importFunc` to a function that will import your components. This is because `webpack` does not allow dynamic imports anymore. This function will be called with the path to the component, and you have to return the import.
 
-You can customise the default path and which files are allowed to be imported. You can use `webpackInclude` as a magicComment to only include `.tsx` files (if you don't webpack will try to load every `.ts` file in src)
+    You can customise the default path and which files are allowed to be imported. You can use `webpackInclude` as a [magicComment](https://webpack.js.org/api/module-methods/#magic-comments) to only include `.tsx` files (if you don't webpack will try to load every `.ts` file in src)
 
 ```tsx
 // pages/next-playground/[...path].tsx
